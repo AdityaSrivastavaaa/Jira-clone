@@ -26,7 +26,8 @@ app.use("/api/v1/orgs", orgRoutes);
 app.use("/api/v1/projects", projectRoutes);
 app.use("/api/v1/issues", issueRoutes);
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
+const PORT = Number(process.env.PORT) || 4000;
+
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
