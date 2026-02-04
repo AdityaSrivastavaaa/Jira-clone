@@ -1,8 +1,6 @@
+import jwt, { SignOptions } from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { env } from "../../config/env";
 
 export const hashPassword = (password: string) => {
   return bcrypt.hash(password, 10);
@@ -13,16 +11,24 @@ export const comparePassword = (password: string, hash: string) => {
 };
 
 export const generateTokens = (userId: string) => {
+  const accessOptions: SignOptions = {
+    expiresIn: env.ACCESS_TOKEN_EXPIRES_IN,
+  };
+
+  const refreshOptions: SignOptions = {
+    expiresIn: env.REFRESH_TOKEN_EXPIRES_IN,
+  };
+
   const accessToken = jwt.sign(
     { userId },
-    process.env.JWT_ACCESS_SECRET!,
-    { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN }
+    env.JWT_ACCESS_SECRET,
+    accessOptions
   );
 
   const refreshToken = jwt.sign(
     { userId },
-    process.env.JWT_REFRESH_SECRET!,
-    { expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN }
+    env.JWT_REFRESH_SECRET,
+    refreshOptions
   );
 
   return { accessToken, refreshToken };

@@ -1,14 +1,19 @@
+//////////////////////////////////////////////////////
+// PRISMA CLIENT
+//////////////////////////////////////////////////////
+
 generator client {
   provider = "prisma-client-js"
+  output   = "./generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
 }
 
-//////////////////////
+//////////////////////////////////////////////////////
 // ENUMS
-//////////////////////
+//////////////////////////////////////////////////////
 
 enum OrgRole {
   OWNER
@@ -37,9 +42,9 @@ enum IssuePriority {
   CRITICAL
 }
 
-//////////////////////
+//////////////////////////////////////////////////////
 // MODELS
-//////////////////////
+//////////////////////////////////////////////////////
 
 model User {
   id        String   @id @default(uuid())
@@ -49,12 +54,15 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  organizations OrganizationMember[]
-  reportedIssues Issue[] @relation("Reporter")
-  assignedIssues Issue[] @relation("Assignee")
-  comments       Comment[]
-  activities     IssueActivityLog[]
+  // Relations
+  organizations   OrganizationMember[]
+  reportedIssues  Issue[] @relation("Reporter")
+  assignedIssues  Issue[] @relation("Assignee")
+  comments        Comment[]
+  activities      IssueActivityLog[]
 }
+
+//////////////////////////////////////////////////////
 
 model Organization {
   id        String   @id @default(uuid())
@@ -63,9 +71,12 @@ model Organization {
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
 
+  // Relations
   members  OrganizationMember[]
   projects Project[]
 }
+
+//////////////////////////////////////////////////////
 
 model OrganizationMember {
   id             String   @id @default(uuid())
@@ -81,6 +92,8 @@ model OrganizationMember {
   @@unique([userId, organizationId])
 }
 
+//////////////////////////////////////////////////////
+
 model Project {
   id             String   @id @default(uuid())
   name           String
@@ -92,12 +105,14 @@ model Project {
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id])
 
+  // Relations
   issues Issue[]
   labels Label[]
 
   @@unique([organizationId, key])
 }
 
+//////////////////////////////////////////////////////
 
 model Issue {
   id          String        @id @default(uuid())
@@ -119,12 +134,15 @@ model Issue {
   reporter    User    @relation("Reporter", fields: [reporterId], references: [id])
   assignee    User?   @relation("Assignee", fields: [assigneeId], references: [id])
 
+  // Relations
   comments   Comment[]
   labels     IssueLabel[]
   activities IssueActivityLog[]
 
   @@index([projectId, status])
 }
+
+//////////////////////////////////////////////////////
 
 model Comment {
   id        String   @id @default(uuid())
@@ -137,6 +155,8 @@ model Comment {
   issue     Issue @relation(fields: [issueId], references: [id])
   user      User  @relation(fields: [userId], references: [id])
 }
+
+//////////////////////////////////////////////////////
 
 model Label {
   id        String   @id @default(uuid())
@@ -151,6 +171,8 @@ model Label {
   @@unique([projectId, name])
 }
 
+//////////////////////////////////////////////////////
+
 model IssueLabel {
   issueId String
   labelId String
@@ -160,6 +182,8 @@ model IssueLabel {
 
   @@id([issueId, labelId])
 }
+
+//////////////////////////////////////////////////////
 
 model IssueActivityLog {
   id        String   @id @default(uuid())
