@@ -11,7 +11,7 @@ import issueRoutes from "./modules/issue/issue.routes"
 import { Request, Response } from "express";
 
 const app = express();
-
+const PORT = Number(process.env.PORT) || 4000;
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
@@ -26,7 +26,7 @@ app.use("/api/v1/orgs", orgRoutes);
 app.use("/api/v1/projects", projectRoutes);
 app.use("/api/v1/issues", issueRoutes);
 
-const PORT = Number(process.env.PORT) || 4000;
+
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
