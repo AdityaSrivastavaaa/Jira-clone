@@ -7,11 +7,11 @@ import {
 } from "./auth.service";
 import { prisma } from "../../config/prisma";
 
-
-
+/**
+ * REGISTER
+ */
 export const register = async (req: Request, res: Response) => {
   const data = registerSchema.parse(req.body);
-   
 
   const existingUser = await prisma.user.findUnique({
     where: { email: data.email },
@@ -36,22 +36,29 @@ export const register = async (req: Request, res: Response) => {
   res
     .cookie("accessToken", tokens.accessToken, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
     })
     .cookie("refreshToken", tokens.refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
     })
     .status(201)
-    .json({ user: { id: user.id, email: user.email, name: user.name } });
+    .json({
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
+    });
 };
 
+/**
+ * LOGIN
+ */
 export const login = async (req: Request, res: Response) => {
   const data = loginSchema.parse(req.body);
-
- 
 
   const user = await prisma.user.findUnique({
     where: { email: data.email },
@@ -72,14 +79,43 @@ export const login = async (req: Request, res: Response) => {
   res
     .cookie("accessToken", tokens.accessToken, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
     })
     .cookie("refreshToken", tokens.refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
     })
-    .json({ user: { id: user.id, email: user.email, name: user.name } });
+    .json({
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
+    });
 };
 
+/**
+ * ME (SESSION RESTORE)
+ * GET /api/v1/auth/me
+ */
+export const me = async (req: Request, res: Response) => {
+  /**
+   * requireAuth middleware attaches user like:
+   * (req as any).user
+   */
+  const user = (req as any).user;
+
+  if (!user) {
+    return res.status(401).json({ message: "Unauthenticated" });
+  }
+
+  res.json({
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    },
+  });
+};
