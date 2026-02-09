@@ -34,24 +34,26 @@ export const register = async (req: Request, res: Response) => {
   const tokens = generateTokens(user.id);
 
   res
-    .cookie("accessToken", tokens.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    })
-    .cookie("refreshToken", tokens.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    })
-    .status(201)
-    .json({
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-      },
-    });
+  .cookie("accessToken", tokens.accessToken, {
+    httpOnly: true,
+    secure: true,        // REQUIRED (Render is HTTPS)
+    sameSite: "none",    // REQUIRED for cross-site
+    path: "/",
+  })
+  .cookie("refreshToken", tokens.refreshToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+  })
+  .status(201) // only in register
+  .json({
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    },
+  });
 };
 
 /**
@@ -77,23 +79,26 @@ export const login = async (req: Request, res: Response) => {
   const tokens = generateTokens(user.id);
 
   res
-    .cookie("accessToken", tokens.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    })
-    .cookie("refreshToken", tokens.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    })
-    .json({
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-      },
-    });
+  .cookie("accessToken", tokens.accessToken, {
+    httpOnly: true,
+    secure: true,        // REQUIRED (Render is HTTPS)
+    sameSite: "none",    // REQUIRED for cross-site
+    path: "/",
+  })
+  .cookie("refreshToken", tokens.refreshToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+  })
+  .status(201) // only in register
+  .json({
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    },
+  });
 };
 
 /**
