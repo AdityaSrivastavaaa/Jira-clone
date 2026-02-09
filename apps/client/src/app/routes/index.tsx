@@ -1,20 +1,21 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useEffect, type JSX } from "react";
 import { useAuthStore } from "../../store/auth.store";
 
-import AppLayout from "../layouts/AppLayout";
 import Login from "../../features/auth/Login";
 import Register from "../../features/auth/Register";
+import AppLayout from "../layouts/AppLayout";
+import type { JSX } from "react";
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
-  const { user, loading, fetchMe } = useAuthStore();
+  const { user, loading } = useAuthStore();
 
-  useEffect(() => {
-    fetchMe();
-  }, []);
+  if (loading) {
+    return null; // or loader
+  }
 
-  if (loading) return null;
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
 
   return children;
 }

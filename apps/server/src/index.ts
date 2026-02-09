@@ -12,7 +12,18 @@ import { Request, Response } from "express";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 4000;
-app.use(cors({ origin: true, credentials: true }));
+app.set("trust proxy", 1); // REQUIRED for Render / proxy
+
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+      "https://your-frontend-domain.vercel.app", // add later
+    ],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 

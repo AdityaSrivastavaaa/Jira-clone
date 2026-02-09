@@ -1,6 +1,31 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { api } from "../../lib/api";
+import { useAuthStore } from "../../store/auth.store";
+import toast from "react-hot-toast";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const fetchMe = useAuthStore((s) => s.fetchMe);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    try {
+      setLoading(true);
+      await api.post("/api/v1/auth/login", { email, password });
+      await fetchMe();
+      toast.success("Logged in");
+      navigate("/");
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-900 text-slate-200">
       <div className="w-full max-w-md bg-slate-800 p-8 rounded-lg shadow">
@@ -8,16 +33,24 @@ export default function Login() {
 
         <input
           placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           className="w-full mb-4 px-4 py-2 rounded bg-slate-700"
         />
         <input
           type="password"
           placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           className="w-full mb-4 px-4 py-2 rounded bg-slate-700"
         />
 
-        <button className="w-full bg-blue-600 py-2 rounded font-medium">
-          Login
+        <button
+          onClick={handleLogin}
+          disabled={loading}
+          className="w-full bg-blue-600 py-2 rounded font-medium"
+        >
+          {loading ? "Logging in..." : "Login"}
         </button>
 
         <p className="mt-4 text-sm text-center text-slate-400">

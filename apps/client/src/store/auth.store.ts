@@ -10,7 +10,6 @@ type User = {
 type AuthState = {
   user: User | null;
   loading: boolean;
-  setUser: (user: User | null) => void;
   fetchMe: () => Promise<void>;
   logout: () => Promise<void>;
 };
@@ -18,8 +17,6 @@ type AuthState = {
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   loading: true,
-
-  setUser: (user) => set({ user, loading: false }),
 
   fetchMe: async () => {
     try {
@@ -32,6 +29,6 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: async () => {
     await api.post("/api/v1/auth/logout");
-    set({ user: null });
+    set({ user: null, loading: false });
   },
 }));
